@@ -1231,7 +1231,7 @@
       function sendToMailerlite(name, email, score) {
         const riskLevel = score <= 4 ? "Green" : score <= 9 ? "Amber" : "Red";
         fetch(
-          "https://appears-pan-adoption-spelling.trycloudflare.com/webhook-test/cf0aa75e-f9c9-4360-94e9-2fe227dea7ce",
+           URL_FOR_DATA,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
