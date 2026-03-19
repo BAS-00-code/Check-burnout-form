@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Burnout Risk Check — Burnout Avoidance System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Figtree:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --cream: #f7f4ef;
+        --cream-deep: #ede9e1;
+        --paper: #fdfbf8;
+        --ink: #1c1a17;
+        --ink-light: #3d3a35;
+        --muted: #7a7368;
+        --subtle: #b0a99e;
+        --border: #e2ddd6;
+        --border2: #d0c9bf;
+        --sage: #4a7c59;
+        --sage-light: #6b9e7a;
+        --sage-bg: #eef4f0;
+        --sage-border: #c8ddd0;
+        --amber: #c9862a;
+        --amber-bg: #fdf3e3;
+        --amber-border: #f0d0a0;
+        --red: #b03a2e;
+        --red-bg: #fdecea;
+        --red-border: #f0b8b0;
+        --font-serif: "Lora", Georgia, serif;
+        --font-sans: "Figtree", system-ui, sans-serif;
+        --shadow-sm: 0 2px 8px rgba(28, 26, 23, 0.06);
+        --shadow-md: 0 8px 32px rgba(28, 26, 23, 0.1);
+        --shadow-lg: 0 24px 64px rgba(28, 26, 23, 0.14);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--cream-deep);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 60% 50% at 15% 15%,
+            rgba(74, 124, 89, 0.05) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 50% 40% at 85% 85%,
+            rgba(201, 134, 42, 0.04) 0%,
+            transparent 60%
+          );
+        pointer-events: none;
+      }
+
+      /* ── CARD ── */
+      .card {
+        width: 100%;
+        max-width: 560px;
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ── SCREEN SYSTEM ── */
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+      }
+
+      /* ── PROGRESS BAR ── */
+      .progress-wrap {
+        height: 3px;
+        background: var(--cream-deep);
+      }
+      .progress-bar {
+        height: 100%;
+        background: var(--sage);
+        transition: width 0.5s ease;
+        border-radius: 0 2px 2px 0;
+      }
+
+      /* ── CARD HEADER ── */
+      .card-header {
+        padding: 28px 36px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        font-family: var(--font-serif);
+        font-size: 13px;
+        font-style: italic;
+        color: var(--subtle);
+        letter-spacing: 0.01em;
+      }
+
+      .step-counter {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--subtle);
+        letter-spacing: 0.04em;
+      }
+
+      /* ── INTRO SCREEN ── */
+      .intro-body {
+        padding: 36px 36px 40px;
+      }
+
+      .intro-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--sage);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .intro-eyebrow::before {
+        content: "";
+        width: 20px;
+        height: 1px;
+        background: var(--sage);
+      }
+
+      .intro-title {
+        font-family: var(--font-serif);
+        font-size: clamp(28px, 5vw, 38px);
+        font-weight: 500;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin-bottom: 16px;
+      }
+
+      .intro-title em {
+        font-style: italic;
+        color: var(--sage);
+      }
+
+      .intro-desc {
+        font-size: 15px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.75;
+        margin-bottom: 32px;
+      }
+
+      .intro-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        color: var(--muted);
+        font-weight: 300;
+      }
+
+      .meta-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--sage-border);
+      }
+
+      .btn-start {
+        width: 100%;
+        background: var(--ink);
+        color: var(--cream);
+        font-family: var(--font-sans);
+        font-weight: 500;
+        font-size: 15px;
+        padding: 16px 28px;
+        border-radius: 100px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.22s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn-start:hover {
+        background: var(--ink-light);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      /* ── QUESTION SCREEN ── */
+      .question-body {
+        padding: 32px 36px 36px;
+      }
+
+      .q-signal-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--sage);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .q-signal-label::before {
+        content: "";
+        width: 16px;
+        height: 1px;
+        background: var(--sage);
+      }
+
+      .q-title {
+        font-family: var(--font-serif);
+        font-size: clamp(20px, 3.5vw, 26px);
+        font-weight: 500;
+        line-height: 1.3;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+        margin-bottom: 10px;
+      }
+
+      .q-desc {
+        font-size: 14px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.65;
+        margin-bottom: 28px;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .option-btn {
+        width: 100%;
+        background: var(--paper);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.18s;
+        text-align: left;
+      }
+
+      .option-btn:hover {
+        border-color: var(--sage-border);
+        background: var(--sage-bg);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .option-btn.selected {
+        border-color: var(--sage);
+        background: var(--sage-bg);
+        box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+      }
+
+      .option-score {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--cream-deep);
+        border: 1.5px solid var(--border2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-serif);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--muted);
+        flex-shrink: 0;
+        transition: all 0.18s;
+      }
+
+      .option-btn.selected .option-score {
+        background: var(--sage);
+        border-color: var(--sage);
+        color: white;
+      }
+
+      .option-text {
+        flex: 1;
+      }
+      .option-label {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 2px;
+      }
+      .option-sub {
+        font-size: 12.5px;
+        font-weight: 300;
+        color: var(--muted);
+      }
+
+      .q-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 24px;
+      }
+
+      .btn-back {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-size: 13.5px;
+        color: var(--subtle);
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 0;
+        transition: color 0.2s;
+      }
+      .btn-back:hover {
+        color: var(--muted);
+      }
+      .btn-back:disabled {
+        opacity: 0.3;
+        cursor: default;
+      }
+
+      .btn-next {
+        background: var(--ink);
+        color: var(--cream);
+        font-family: var(--font-sans);
+        font-weight: 500;
+        font-size: 14px;
+        padding: 12px 28px;
+        border-radius: 100px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .btn-next.ready {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .btn-next.ready:hover {
+        background: var(--ink-light);
+        transform: translateY(-1px);
+      }
+
+      /* ── EMAIL SCREEN ── */
+      .email-body {
+        padding: 36px 36px 40px;
+      }
+
+      .email-title {
+        font-family: var(--font-serif);
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 500;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin-bottom: 12px;
+      }
+
+      .email-title em {
+        font-style: italic;
+        color: var(--sage);
+      }
+
+      .email-desc {
+        font-size: 15px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.7;
+        margin-bottom: 28px;
+      }
+
+      .result-preview {
+        background: var(--cream-deep);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .result-blur {
+        flex: 1;
+      }
+
+      .result-blur-bar {
+        height: 10px;
+        border-radius: 4px;
+        background: var(--border2);
+        margin-bottom: 8px;
+        filter: blur(3px);
+      }
+
+      .result-blur-bar:last-child {
+        width: 60%;
+        margin-bottom: 0;
+      }
+
+      .lock-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--cream);
+        border: 1px solid var(--border2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 15px;
+      }
+
+      .email-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .field-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-light);
+        letter-spacing: 0.03em;
+      }
+
+      .field-input {
+        width: 100%;
+        background: var(--cream);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 13px 16px;
+        font-family: var(--font-sans);
+        font-size: 15px;
+        color: var(--ink);
+        font-weight: 300;
+        outline: none;
+        transition: border-color 0.2s;
+        -webkit-appearance: none;
+      }
+      .field-input:focus {
+        border-color: var(--sage);
+      }
+      .field-input::placeholder {
+        color: var(--subtle);
+      }
+
+      .btn-reveal {
+        width: 100%;
+        background: var(--sage);
+        color: white;
+        font-family: var(--font-sans);
+        font-weight: 500;
+        font-size: 15px;
+        padding: 16px 28px;
+        border-radius: 100px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.22s;
+        margin-top: 4px;
+      }
+      .btn-reveal:hover {
+        background: var(--sage-light);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(74, 124, 89, 0.25);
+      }
+
+      .email-privacy {
+        font-size: 11.5px;
+        color: var(--subtle);
+        text-align: center;
+        font-weight: 300;
+        margin-top: 8px;
+      }
+
+      /* ── RESULT SCREEN ── */
+      .result-body {
+        padding: 0 0 40px;
+      }
+
+      .result-banner {
+        padding: 32px 36px;
+        margin-bottom: 28px;
+      }
+
+      .result-banner.green {
+        background: var(--sage-bg);
+        border-bottom: 1px solid var(--sage-border);
+      }
+      .result-banner.amber {
+        background: var(--amber-bg);
+        border-bottom: 1px solid var(--amber-border);
+      }
+      .result-banner.red {
+        background: var(--red-bg);
+        border-bottom: 1px solid var(--red-border);
+      }
+
+      .result-status {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .result-status.green {
+        color: var(--sage);
+      }
+      .result-status.amber {
+        color: var(--amber);
+      }
+      .result-status.red {
+        color: var(--red);
+      }
+
+      .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .green .status-indicator {
+        background: var(--sage);
+      }
+      .amber .status-indicator {
+        background: var(--amber);
+      }
+      .red .status-indicator {
+        background: var(--red);
+      }
+
+      .result-headline {
+        font-family: var(--font-serif);
+        font-size: clamp(22px, 4vw, 30px);
+        font-weight: 500;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin-bottom: 10px;
+      }
+
+      .result-headline em {
+        font-style: italic;
+      }
+
+      .result-summary {
+        font-size: 15px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .result-score-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .score-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 14px;
+        border-radius: 100px;
+      }
+      .score-pill.green {
+        background: white;
+        color: var(--sage);
+        border: 1px solid var(--sage-border);
+      }
+      .score-pill.amber {
+        background: white;
+        color: var(--amber);
+        border: 1px solid var(--amber-border);
+      }
+      .score-pill.red {
+        background: white;
+        color: var(--red);
+        border: 1px solid var(--red-border);
+      }
+
+      .result-signals {
+        padding: 0 36px;
+        margin-bottom: 28px;
+      }
+
+      .signals-title {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--subtle);
+        margin-bottom: 14px;
+      }
+
+      .signal-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .signal-row:last-child {
+        border-bottom: none;
+      }
+
+      .signal-name {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--ink-light);
+      }
+
+      .signal-score-badge {
+        font-size: 12px;
+        font-weight: 600;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .badge-0 {
+        background: var(--sage-bg);
+        color: var(--sage);
+      }
+      .badge-1 {
+        background: var(--amber-bg);
+        color: var(--amber);
+      }
+      .badge-2 {
+        background: var(--red-bg);
+        color: var(--red);
+      }
+
+      .result-cta {
+        padding: 0 36px;
+      }
+
+      .cta-box {
+        background: var(--ink);
+        border-radius: 16px;
+        padding: 28px;
+        text-align: center;
+      }
+
+      .cta-box-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: rgba(247, 244, 239, 0.45);
+        margin-bottom: 10px;
+      }
+
+      .cta-box-title {
+        font-family: var(--font-serif);
+        font-size: 20px;
+        font-weight: 500;
+        color: var(--cream);
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        margin-bottom: 8px;
+      }
+
+      .cta-box-title em {
+        font-style: italic;
+        color: #6b9e7a;
+      }
+
+      .cta-box-desc {
+        font-size: 13.5px;
+        font-weight: 300;
+        color: rgba(247, 244, 239, 0.55);
+        line-height: 1.65;
+        margin-bottom: 20px;
+      }
+
+      .btn-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--cream);
+        color: var(--ink);
+        font-weight: 500;
+        font-size: 14px;
+        padding: 13px 26px;
+        border-radius: 100px;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      .btn-cta:hover {
+        background: var(--paper);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+
+      .result-back {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .result-back a {
+        font-size: 13px;
+        color: var(--subtle);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .result-back a:hover {
+        color: var(--muted);
+      }
+
+      /* ── TRANSITIONS ── */
+      .screen {
+        animation: screenIn 0.4s ease;
+      }
+
+      @keyframes screenIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── FOOTER ── */
+      .quiz-footer {
+        margin-top: 24px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--subtle);
+        position: relative;
+        z-index: 2;
+      }
+
+      .quiz-footer a {
+        color: var(--subtle);
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card" id="quiz-card">
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+      </div>
+
+      <!-- ── SCREEN 0: INTRO ── -->
+      <div class="screen active" id="screen-intro">
+        <div class="card-header">
+          <span class="brand">Burnout Avoidance System</span>
+        </div>
+        <div class="intro-body">
+          <div class="intro-eyebrow">Free risk check</div>
+          <h1 class="intro-title">
+            How close are you to <em>burning out?</em>
+          </h1>
+          <p class="intro-desc">
+            Seven signals that appear weeks before collapse. This is not about
+            stress or motivation. It checks the system-level signs that most
+            people miss until it is too late.
+          </p>
+          <div class="intro-meta">
+            <div class="meta-item">
+              <span class="meta-dot"></span>7 questions
+            </div>
+            <div class="meta-item"><span class="meta-dot"></span>2 minutes</div>
+            <div class="meta-item">
+              <span class="meta-dot"></span>Instant result
+            </div>
+          </div>
+          <button class="btn-start" onclick="startQuiz()">
+            Start the check
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M3 7h8M8 4l3 3-3 3"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── SCREENS 1-7: QUESTIONS ── -->
+      <div class="screen" id="screen-questions">
+        <div class="progress-wrap" style="display: none"></div>
+        <div class="card-header">
+          <span class="brand">Burnout Avoidance System</span>
+          <span class="step-counter" id="step-counter">1 of 7</span>
+        </div>
+        <div class="question-body">
+          <div class="q-signal-label" id="q-signal">Signal one</div>
+          <h2 class="q-title" id="q-title">Loading...</h2>
+          <p class="q-desc" id="q-desc"></p>
+
+          <div class="options" id="options-wrap">
+            <button
+              class="option-btn"
+              data-value="0"
+              onclick="selectOption(this, 0)"
+            >
+              <div class="option-score">0</div>
+              <div class="option-text">
+                <div class="option-label">Not happening</div>
+                <div class="option-sub">
+                  This does not apply to me right now
+                </div>
+              </div>
+            </button>
+            <button
+              class="option-btn"
+              data-value="1"
+              onclick="selectOption(this, 1)"
+            >
+              <div class="option-score">1</div>
+              <div class="option-text">
+                <div class="option-label">Occasionally</div>
+                <div class="option-sub">I notice this sometimes</div>
+              </div>
+            </button>
+            <button
+              class="option-btn"
+              data-value="2"
+              onclick="selectOption(this, 2)"
+            >
+              <div class="option-score">2</div>
+              <div class="option-text">
+                <div class="option-label">Frequently or increasing</div>
+                <div class="option-sub">This is a recurring pattern</div>
+              </div>
+            </button>
+          </div>
+
+          <div class="q-nav">
+            <button class="btn-back" id="btn-back" onclick="prevQuestion()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <path
+                  d="M8 2.5L4 6.5l4 4"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Back
+            </button>
+            <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+              Next
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <path
+                  d="M2.5 6.5h8M7.5 3.5l3 3-3 3"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 8: EMAIL CAPTURE ── -->
+      <div class="screen" id="screen-email">
+        <div class="card-header">
+          <span class="brand">Burnout Avoidance System</span>
+          <span class="step-counter">Almost there</span>
+        </div>
+        <div class="email-body">
+          <h2 class="email-title">Your result is <em>ready.</em></h2>
+          <p class="email-desc">
+            Enter your email to unlock your burnout risk score and see where you
+            stand.
+          </p>
+
+          <div class="result-preview">
+            <div class="result-blur">
+              <div class="result-blur-bar" style="width: 80%"></div>
+              <div class="result-blur-bar" style="width: 60%"></div>
+              <div class="result-blur-bar"></div>
+            </div>
+            <div class="lock-icon">🔒</div>
+          </div>
+
+          <div class="email-form">
+            <div class="field-wrap">
+              <label class="field-label" for="first-name">First name</label>
+              <input
+                class="field-input"
+                type="text"
+                id="first-name"
+                placeholder="Your first name"
+                autocomplete="given-name"
+              />
+            </div>
+            <div class="field-wrap">
+              <label class="field-label" for="email-input">Email address</label>
+              <input
+                class="field-input"
+                type="email"
+                id="email-input"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+            </div>
+            <button class="btn-reveal" onclick="submitEmail()">
+              Show my result
+            </button>
+            <p class="email-privacy">
+              No spam. You can unsubscribe at any time.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 9: RESULT ── -->
+      <div class="screen" id="screen-result">
+        <div class="result-body">
+          <div class="result-banner" id="result-banner">
+            <div class="result-status" id="result-status">
+              <span class="status-indicator"></span>
+              <span id="result-status-text">Loading</span>
+            </div>
+            <h2 class="result-headline" id="result-headline"></h2>
+            <p class="result-summary" id="result-summary"></p>
+            <div class="result-score-row">
+              <div class="score-pill" id="score-pill">
+                Score: <span id="score-display">0</span> / 14
+              </div>
+            </div>
+          </div>
+
+          <div class="result-signals" id="result-signals">
+            <div class="signals-title">Your signal breakdown</div>
+            <div id="signals-list"></div>
+          </div>
+
+          <div class="result-cta">
+            <div class="cta-box">
+              <div class="cta-box-label">Next step</div>
+              <div class="cta-box-title" id="cta-title">Loading...</div>
+              <p class="cta-box-desc" id="cta-desc"></p>
+              <a
+                href="https://reserved-pages-034931.framer.app/"
+                class="btn-cta"
+                id="cta-btn"
+              >
+                <span id="cta-btn-text">Learn more</span>
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <path
+                    d="M2.5 6.5h8M7.5 3.5l3 3-3 3"
+                    stroke="white"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="result-back">
+            <a href="#" onclick="retakeQuiz()">Retake the check</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /card -->
+
+    <div class="quiz-footer">
+      <a href="https://reserved-pages-034931.framer.app/"
+        >burnoutavoidancesystem.com</a
+      >
+    </div>
+
+    <script>
+      const QUESTIONS = [
+        {
+          signal: "Signal one",
+          title: "Recovery no longer restores you",
+          desc: "You rest, but your baseline does not reset. Sleep and time off help less than they used to.",
+        },
+        {
+          signal: "Signal two",
+          title: "High-energy tasks feel heavier than they should",
+          desc: "Thinking, deciding, or focusing requires more effort than before. The effort-to-output ratio is quietly inverting.",
+        },
+        {
+          signal: "Signal three",
+          title: "Discipline is doing the work, not capacity",
+          desc: "Output is maintained by willpower rather than energy. You are still producing, but something is carrying the load that should not have to.",
+        },
+        {
+          signal: "Signal four",
+          title: "Context switching feels unusually draining",
+          desc: "Fragmented days leave you exhausted even when no single task was intense.",
+        },
+        {
+          signal: "Signal five",
+          title: "Emotional volatility has increased slightly",
+          desc: "More irritability, reduced patience, or subtle dread. Emotional regulation tends to degrade early under sustained load.",
+        },
+        {
+          signal: "Signal six",
+          title: "You ignore signals because output is still fine",
+          desc: "You rationalise fatigue because performance has not yet dropped. This is one of the clearest warning signs.",
+        },
+        {
+          signal: "Signal seven",
+          title: "Bad days take longer to recover from",
+          desc: "One hard day used to reset overnight. Now it bleeds into the next. The recovery window is shrinking.",
+        },
+      ];
+
+      let current = 0;
+      let answers = new Array(7).fill(null);
+      let totalScore = 0;
+
+      function updateProgress(step) {
+        // step: 0 = intro, 1-7 = questions, 8 = email, 9 = result
+        const pct = step === 0 ? 0 : step >= 9 ? 100 : (step / 9) * 100;
+        document.getElementById("progress-bar").style.width = pct + "%";
+      }
+
+      function showScreen(id) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+      }
+
+      function startQuiz() {
+        current = 0;
+        answers = new Array(7).fill(null);
+        loadQuestion(0);
+        showScreen("screen-questions");
+        updateProgress(1);
+      }
+
+      function loadQuestion(index) {
+        const q = QUESTIONS[index];
+        document.getElementById("q-signal").textContent = q.signal;
+        document.getElementById("q-title").textContent = q.title;
+        document.getElementById("q-desc").textContent = q.desc;
+        document.getElementById("step-counter").textContent =
+          index + 1 + " of 7";
+
+        // Reset options
+        document
+          .querySelectorAll(".option-btn")
+          .forEach((btn) => btn.classList.remove("selected"));
+
+        // Restore answer if exists
+        if (answers[index] !== null) {
+          const savedBtn = document.querySelector(
+            `.option-btn[data-value="${answers[index]}"]`,
+          );
+          if (savedBtn) savedBtn.classList.add("selected");
+          document.getElementById("btn-next").classList.add("ready");
+        } else {
+          document.getElementById("btn-next").classList.remove("ready");
+        }
+
+        // Back button
+        const backBtn = document.getElementById("btn-back");
+        backBtn.disabled = index === 0;
+
+        // Next button label
+        const nextBtn = document.getElementById("btn-next");
+        nextBtn.innerHTML =
+          index < 6
+            ? 'Next <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            : 'See my result <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      }
+
+      function selectOption(btn, value) {
+        document
+          .querySelectorAll(".option-btn")
+          .forEach((b) => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        answers[current] = value;
+        document.getElementById("btn-next").classList.add("ready");
+      }
+
+      function nextQuestion() {
+        if (answers[current] === null) return;
+        if (current < 6) {
+          current++;
+          loadQuestion(current);
+          updateProgress(current + 1);
+        } else {
+          // Go to email capture
+          showScreen("screen-email");
+          updateProgress(8);
+        }
+      }
+
+      function prevQuestion() {
+        if (current > 0) {
+          current--;
+          loadQuestion(current);
+          updateProgress(current + 1);
+        }
+      }
+
+      function submitEmail() {
+        const name = document.getElementById("first-name").value.trim();
+        const email = document.getElementById("email-input").value.trim();
+
+        if (!email || !email.includes("@")) {
+          document.getElementById("email-input").style.borderColor = "#B03A2E";
+          document.getElementById("email-input").focus();
+          return;
+        }
+
+        document.getElementById("email-input").style.borderColor = "";
+
+        // Calculate score
+        totalScore = answers.reduce(
+          (sum, val) => sum + (val !== null ? val : 0),
+          0,
+        );
+
+        // Send to Mailerlite
+        // REPLACE the URL below with your Mailerlite embedded form action URL
+        // To find it: Mailerlite > Forms > Embedded forms > copy the action URL
+        sendToMailerlite(name, email, totalScore);
+
+        // Show result
+        showResult(totalScore, name);
+        showScreen("screen-result");
+        updateProgress(9);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // function sendToMailerlite(name, email, score) {
+      // Option A: Mailerlite embedded form (replace YOUR_FORM_ID)
+      // fetch('https://assets.mailerlite.com/jsonp/YOUR_FORM_ID/forms/YOUR_FORM_ID/subscribe', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ fields: { email: email, name: name }, groups: ['YOUR_GROUP_ID'] })
+      // });
+
+      // Option B: Zapier webhook (replace YOUR_WEBHOOK_URL)
+      // fetch('YOUR_ZAPIER_WEBHOOK_URL', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ name: name, email: email, score: score })
+      // });
+
+      //   console.log('Would send:', { name, email, score });
+      //}
+
+      function sendToMailerlite(name, email, score) {
+        const riskLevel = score <= 4 ? "Green" : score <= 9 ? "Amber" : "Red";
+        fetch(
+          "https://appears-pan-adoption-spelling.trycloudflare.com/webhook-test/cf0aa75e-f9c9-4360-94e9-2fe227dea7ce",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              score: score,
+              risk_level: riskLevel,
+            }),
+          },
+        );
+      }
+      const RISK_LEVELS = [
+        { max: 4, label: "Green — Sustainable" },
+        { max: 9, label: "Amber — Drifting" },
+        { max: 14, label: "Red — Near threshold" },
+      ];
+      function showResult(score, name) {
+        const banner = document.getElementById("result-banner");
+        const status = document.getElementById("result-status");
+        const statusTxt = document.getElementById("result-status-text");
+        const headline = document.getElementById("result-headline");
+        const summary = document.getElementById("result-summary");
+        const scorePill = document.getElementById("score-pill");
+        const scoreDisp = document.getElementById("score-display");
+        const ctaTitle = document.getElementById("cta-title");
+        const ctaDesc = document.getElementById("cta-desc");
+        const ctaBtnTxt = document.getElementById("cta-btn-text");
+
+        scoreDisp.textContent = score;
+
+        let level, data;
+
+        if (score <= 4) {
+          level = RISK_LEVELS[0].label.toLowerCase().split(" ")[0]; // "green"
+          data = {
+            status: "Green — Sustainable",
+            headline: name
+              ? `${name}, you are operating within sustainable limits.`
+              : "You are operating within sustainable limits.",
+            summary:
+              "Your signals are currently within manageable range. This is the ideal window to build a system that keeps you here — before the drift begins.",
+            cta_title: "Build the system <em>while you still can.</em>",
+            cta_desc:
+              "Most people only act when they are already Amber or Red. You have the advantage of acting now.",
+            cta_btn: "See how the system works",
+          };
+        } else if (score <= 9) {
+          level = RISK_LEVELS[1].label.toLowerCase().split(" ")[0]; // "amber"
+          data = {
+            status: "Amber — Drifting",
+            headline: name
+              ? `${name}, you are drifting. This is the intervention window.`
+              : "You are drifting. This is the intervention window.",
+            summary:
+              "Multiple signals are active. Output still looks fine — but capacity is eroding underneath. This is exactly the stage where intervention is most effective.",
+            cta_title: "The system is built <em>for this stage.</em>",
+            cta_desc:
+              "Amber is where most people ignore the signs and wait for Red. You do not have to do that.",
+            cta_btn: "See the Burnout Avoidance System",
+          };
+        } else {
+          level = RISK_LEVELS[2].label.toLowerCase().split(" ")[0]; // "red"
+          data = {
+            status: "Red — Near threshold",
+            headline: name
+              ? `${name}, you are likely weeks from enforced shutdown.`
+              : "You are likely weeks from enforced shutdown.",
+            summary:
+              "Several signals are elevated and increasing. If nothing changes, the system will make the decision for you. The good news: this stage is still correctable.",
+            cta_title: "You need a system, <em>not more willpower.</em>",
+            cta_desc:
+              "Burnout at this stage is not a motivation problem. It is a systems problem. The Burnout Avoidance System is designed to correct exactly this.",
+            cta_btn: "Get the Burnout Avoidance System",
+          };
+        }
+
+        // Apply styles
+        banner.className = "result-banner " + level;
+        status.className = "result-status " + level;
+        scorePill.className = "score-pill " + level;
+        statusTxt.textContent = data.status;
+        headline.textContent = data.headline;
+        summary.textContent = data.summary;
+        ctaTitle.innerHTML = data.cta_title;
+        ctaDesc.textContent = data.cta_desc;
+        ctaBtnTxt.textContent = data.cta_btn;
+
+        // Signal breakdown
+        const signalsList = document.getElementById("signals-list");
+        signalsList.innerHTML = "";
+        QUESTIONS.forEach((q, i) => {
+          const val = answers[i] !== null ? answers[i] : 0;
+          const row = document.createElement("div");
+          row.className = "signal-row";
+          row.innerHTML = `
+        <span class="signal-name">${q.title}</span>
+        <span class="signal-score-badge badge-${val}">${val}</span>
+      `;
+          signalsList.appendChild(row);
+        });
+      }
+
+      function retakeQuiz() {
+        current = 0;
+        answers = new Array(7).fill(null);
+        showScreen("screen-intro");
+        updateProgress(0);
+        return false;
+      }
+    </script>
+  </body>
+</html>
